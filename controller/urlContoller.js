@@ -18,7 +18,12 @@ const shortenUrl = async (req, res) => {
       shortCode,
     });
 
-    res.status(201).json(url);
+    res.status(201).json({
+    message: "Short URL created successfully",
+    shortUrl: `${req.protocol}://${req.get("host")}/${shortCode}`,
+    originalUrl: url.originalUrl,
+    shortCode: url.shortCode,
+    });
   } catch (error) {
     res.status(500).json({
       message: error.message,
