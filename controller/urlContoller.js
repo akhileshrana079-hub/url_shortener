@@ -1,16 +1,21 @@
+const validator = require("validator");
 const Url = require("../models/url");
 const { nanoid } = require('nanoid');
 
 const shortenUrl = async (req, res) => {
   try {
     const { originalUrl } = req.body;
-
     if (!originalUrl) {
       return res.status(400).json({
         message: "URL is required",
       });
     }
 
+    if (!validator.isURL(originalUrl, { require_protocol: true })) {
+      return res.status(400).json({
+      message: "Please provide a valid URL starting with http:// or https://",
+  });
+}f
     const shortCode = nanoid(6);
 
     const url = await Url.create({
