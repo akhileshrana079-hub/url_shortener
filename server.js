@@ -8,7 +8,7 @@ app.use(express.json());
 
 const urlRoutes = require('./routes/urlRoutes');
 app.use('/api/url',urlRoutes);
-
+app.use('/',urlRoutes);
 
 const PORT = process.env.PORT || 5000;
 
