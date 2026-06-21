@@ -75,7 +75,33 @@ const redirectUrl = async (req, res) => {
   }
 };
 
+const getUrlAnalytics = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    const url = await Url.findOne({ shortCode });
+
+    if (!url) {
+      return res.status(404).json({
+        message: "Short URL not found",
+      });
+    }
+
+    return res.status(200).json({
+      originalUrl: url.originalUrl,
+      shortCode: url.shortCode,
+      clicks: url.clicks,
+      createdAt: url.createdAt,
+      updatedAt: url.updatedAt,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   shortenUrl,
-  redirectUrl
+  redirectUrl,
+  getUrlAnalytics
 };
