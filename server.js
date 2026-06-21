@@ -1,8 +1,10 @@
+const { connectRedis } = require("./config/redis");
 require("dotenv").config();
 const express = require("express");
 const app = express();
 const connectDB = require("./config/db");
 connectDB();
+connectRedis();
 
 app.use(express.json());
 
