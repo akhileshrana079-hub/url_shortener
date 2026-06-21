@@ -4,7 +4,7 @@ const { nanoid } = require('nanoid');
 
 const shortenUrl = async (req, res) => {
   try {
-    const { originalUrl, customCode } = req.body;
+    const { originalUrl, customCode,expiresAt } = req.body;
 
     if (!originalUrl) {
       return res.status(400).json({
@@ -37,6 +37,7 @@ const shortenUrl = async (req, res) => {
     const url = await Url.create({
       originalUrl,
       shortCode,
+      expiresAt:expiresAt||null
     });
 
     return res.status(201).json({
@@ -63,7 +64,11 @@ const redirectUrl = async (req, res) => {
         message: "Short URL not found",
       });
     }
-
+    if(url.expiresAt && url.expiresAt < new Date()) {
+      return res.status(410).json({
+      message: "This short URL has expired",
+    });
+}
     url.clicks += 1;
     await url.save();
 
@@ -93,6 +98,7 @@ const getUrlAnalytics = async (req, res) => {
       clicks: url.clicks,
       createdAt: url.createdAt,
       updatedAt: url.updatedAt,
+      expiresAt: url.expiresAt,
     });
   } catch (error) {
     return res.status(500).json({
