@@ -100,8 +100,25 @@ const getUrlAnalytics = async (req, res) => {
     });
   }
 };
+
+const getAllUrls = async (req, res) => {
+  try {
+    const urls = await Url.find().sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      count: urls.length,
+      urls,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   shortenUrl,
   redirectUrl,
-  getUrlAnalytics
+  getUrlAnalytics,
+  getAllUrls
 };
