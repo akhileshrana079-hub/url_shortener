@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    container_name: url-shortener-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: npm start
+
+  redis:
+    image: redis:7-alpine
+    container_name: url-shortener-redis
+    ports:
+      - "6379:6379"
