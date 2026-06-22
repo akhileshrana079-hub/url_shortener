@@ -3,7 +3,7 @@ const { nanoid } = require('nanoid');
 const validator = require('validator');
 const { redisClient } = require('../config/redis');
 
-const shortenUrl = async (req, res) => {
+const shortenUrl = async (req, res,next) => {
   try {
     const { originalUrl, customCode,expiresAt } = req.body;
 
@@ -48,13 +48,11 @@ const shortenUrl = async (req, res) => {
       shortCode: url.shortCode,
     });
   } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
-  }
+    next(error);
+}
 };
 
-const redirectUrl = async (req, res) => {
+const redirectUrl = async (req, res,next) => {
   try {
     const { shortCode } = req.params;
 
@@ -97,13 +95,11 @@ const redirectUrl = async (req, res) => {
 
     return res.redirect(url.originalUrl);
   } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
-  }
+    next(error);
+}
 };
 
-const getUrlAnalytics = async (req, res) => {
+const getUrlAnalytics = async (req, res,next) => {
   try {
     const { shortCode } = req.params;
 
@@ -124,13 +120,11 @@ const getUrlAnalytics = async (req, res) => {
       expiresAt: url.expiresAt,
     });
   } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
-  }
+    next(error);
+}
 };
 
-const getAllUrls = async (req, res) => {
+const getAllUrls = async (req, res,next) => {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 5;
@@ -153,10 +147,8 @@ const getAllUrls = async (req, res) => {
       urls,
     });
   } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
-  }
+    next(error);
+}
 };
 
 module.exports = {

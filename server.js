@@ -5,12 +5,14 @@ const app = express();
 const connectDB = require("./config/db");
 connectDB();
 connectRedis();
+const errorHandler = require("./middleware/errorHandler");
 
 app.use(express.json());
 
 const urlRoutes = require('./routes/urlRoutes');
 app.use('/api/url',urlRoutes);
 app.use('/',urlRoutes);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
