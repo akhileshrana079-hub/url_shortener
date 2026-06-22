@@ -1,6 +1,7 @@
-const validator = require("validator");
-const Url = require("../models/url");
+const Url = require('../models/url');
 const { nanoid } = require('nanoid');
+const validator = require('validator');
+const { redisClient } = require('../config/redis');
 
 const shortenUrl = async (req, res) => {
   try {
@@ -57,6 +58,22 @@ const redirectUrl = async (req, res) => {
   try {
     const { shortCode } = req.params;
 
+    const cacheKey = `url:${shortCode}`;
+
+    const cachedUrl = await redisClient.get(cacheKey);
+
+    if (cachedUrl) {
+      console.log("Cache hit");
+      await Url.findOneAndUpdate(
+        { shortCode },
+        { $inc: { clicks: 1 } }
+      );
+
+      return res.redirect(cachedUrl);
+    }
+
+    console.log("Cache miss");
+
     const url = await Url.findOne({ shortCode });
 
     if (!url) {
@@ -64,11 +81,17 @@ const redirectUrl = async (req, res) => {
         message: "Short URL not found",
       });
     }
-    if(url.expiresAt && url.expiresAt < new Date()) {
+
+    if (url.expiresAt && url.expiresAt < new Date()) {
       return res.status(410).json({
-      message: "This short URL has expired",
+        message: "This short URL has expired",
+      });
+    }
+
+    await redisClient.set(cacheKey, url.originalUrl, {
+      EX: 3600,
     });
-}
+
     url.clicks += 1;
     await url.save();
 
